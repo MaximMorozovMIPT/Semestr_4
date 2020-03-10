@@ -54,7 +54,7 @@ int main()
     std::vector<Bullet> bulletVec;
 
     window.setKeyRepeatEnabled(true);
-
+    sf::Time oldTime = clock.getElapsedTime();
     window.setFramerateLimit(30);
     while (window.isOpen())
     {
@@ -72,7 +72,16 @@ int main()
         window.clear(sf::Color::White);
         window.draw(circle);
         Laser(circle, window);
-        NewBullet(circle, window, clock, bulletVec);
+        sf::Time newTime = clock.getElapsedTime();
+        if (newTime.asMilliseconds() - oldTime.asMilliseconds() > 100)
+        {
+            NewBullet(circle, window, clock, bulletVec);
+            oldTime = newTime;
+        }
+        for (int i = 0; i < bulletVec.size(); i++) {
+            bulletVec[i].draw(window);
+            bulletVec[i].fire();
+        }
         window.display();
     }
 
@@ -153,7 +162,6 @@ void NewBullet(sf::Sprite& circle, sf::RenderWindow& window, sf::Clock& clock, s
 {
     float angle = circle.getRotation();
     bool isFiring = false;
-    sf::Time time = clock.getElapsedTime();
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
         isFiring = true;
     }
@@ -168,10 +176,5 @@ void NewBullet(sf::Sprite& circle, sf::RenderWindow& window, sf::Clock& clock, s
 
         bulletVec.push_back(newBullet);
         isFiring = false;
-    }
-
-    for (int i = 0; i < bulletVec.size(); i++) {
-        bulletVec[i].draw(window);
-        bulletVec[i].fire();
     }
 }
